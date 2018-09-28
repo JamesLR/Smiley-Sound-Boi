@@ -1,0 +1,100 @@
+var direction;
+var rotation;
+var increment;
+var smiley;
+var texts = 1;
+
+
+
+function setup() {
+  createCanvas(400, 400);
+	rectMode(CENTER);
+	smiley = createGraphics(400,400);
+	smiley.clear();
+	mic = new p5.AudioIn();
+   mic.start();
+   fft = new p5.FFT();
+   fft.setInput(mic);
+	
+  // this stuff here are the controls
+	if (texts === 1){
+	createP("Click to display sound!");
+	createP("Press the space bar to change direction");
+	createP('Use the A key to reset.');
+		texts = 2;
+	}
+	
+	
+	direction = true;
+	rotation = 0;
+	increment = 0.025;
+}
+
+function draw() {
+	background(255, 0.5);
+		translate(width/2, height/2);
+	
+	// making the actual face
+	fill(255);
+	noStroke();
+  ellipse(25, -15, 20);
+  ellipse(-25, -15, 20);
+  arc(0, 10, 25, 25, radians(0), radians(180));
+	
+	push();
+
+ 
+	var distance = 12;
+	var d = 7;
+			var audioBounce = fft.analyze();
+	
+
+	    //only displays visualization of sound when mouse is held down
+	    if (mouseIsPressed){
+	rotate(rotation);
+	if(audioBounce[1]*distance/d === 0){
+    	// if there is no sound
+    	//colourful line
+			stroke(random(255), random(255), random(255));
+	    line(0,0, 50,50);
+	    stroke(random(255), random(255), random(255));
+		  noFill();
+    // colourful circle to indicate end of line
+		ellipse(50, 50, 5);
+			translate(50,50);
+	}else{
+    // if there IS sound
+    //same dealio as above
+			stroke(random(255), random(255), random(255));
+	    line(0,0, audioBounce[1]*distance/d+50,audioBounce[1]*distance/d+50);
+	    stroke(random(255), random(255), random(255));
+		  noFill();
+	    ellipse(audioBounce[1]*distance/d+50, audioBounce[1]*distance/d+50, 7);
+			translate(audioBounce[1]*distance/d+50,audioBounce[1]*distance/d+50);
+	}
+	
+	}
+	
+	
+	
+	pop(); 
+	
+  // makes it rotate
+	if (direction){
+		rotation += increment;
+	}else{
+		rotation -= increment;
+	}
+}
+function keyPressed(){
+  // changes direction when spacebar is hit
+	if(key === ' '){
+		direction = !direction;
+	}
+  // resets if 'a' key is hit
+	if(key === 'a'){
+		setup();
+	}
+	
+	
+}
